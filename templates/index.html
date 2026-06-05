@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralCanvas - Real-Time AI Style Transfer</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+    min-height:100vh;
+
+    background:
+        linear-gradient(
+            rgba(4,8,30,0.80),
+            rgba(4,8,30,0.80)
+        ),
+        url('/static/bg.png');
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+}
+
+        .container{
+            width:95%;
+            max-width:1400px;
+            margin:auto;
+        }
+
+        .glass{
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.08);
+            backdrop-filter:blur(18px);
+            border-radius:24px;
+        }
+
+        .title{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.title h1{
+    font-size:72px;
+    font-weight:700;
+
+    background:linear-gradient(
+        90deg,
+        #ffffff,
+        #60a5fa
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+    text-shadow:
+        0 0 20px rgba(96,165,250,.4);
+}
+
+.title p{
+    color:#d1d5db;
+    font-size:24px;
+    margin-top:10px;
+}
+        /* Workflow Section */
+
+.workflow{
+    display:flex;
+    gap:25px;
+    padding:30px;
+    margin-bottom:35px;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.step{
+    flex:1;
+}
+
+.step h3{
+    margin-bottom:15px;
+    font-size:20px;
+    color:white;
+}
+
+.upload-box{
+    border:2px solid #6d4cff;
+    border-radius:18px;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    cursor:pointer;
+    background:rgba(255,255,255,0.02);
+}
+
+.upload-box i{
+    font-size:40px;
+    color:#8b5cf6;
+}
+
+.upload-box h4{
+    font-size:18px;
+}
+
+.upload-box p{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.upload-box input{
+    display:none;
+}
+
+.step select{
+    width:100%;
+    padding:20px;
+    border:none;
+    border-radius:16px;
+    background:#071327;
+    color:white;
+    font-size:18px;
+}
+
+.step button{
+    width:100%;
+    padding:20px;
+    border:none;
+    border-radius:16px;
+    font-size:20px;
+    font-weight:600;
+    color:white;
+    cursor:pointer;
+
+    background:
+    linear-gradient(
+        90deg,
+        #7c3aed,
+        #38bdf8
+    );
+}
+
+.step button:hover{
+    transform:translateY(-2px);
+}
+
+/* Comparison Section */
+
+.comparison{
+    display:flex;
+    gap:25px;
+    align-items:center;
+    justify-content:center;
+}
+
+.image-card{
+    flex:1;
+    padding:20px;
+}
+
+.image-card h3{
+    margin-bottom:15px;
+    color:#38bdf8;
+}
+
+.image-card img{
+    width:100%;
+    height:380px;
+    object-fit:cover;
+    border-radius:18px;
+    border:2px solid rgba(255,255,255,0.1);
+    display:none;
+}
+
+.arrow{
+    width:80px;
+    height:80px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+    linear-gradient(
+        180deg,
+        #7c3aed,
+        #312e81
+    );
+
+    font-size:42px;
+
+    color:white;
+
+    box-shadow:
+        0 0 25px rgba(124,58,237,.5);
+}
+
+/* Status */
+
+#status{
+    margin:25px auto;
+
+    width:fit-content;
+
+    padding:14px 35px;
+
+    border-radius:12px;
+
+    background:
+    rgba(34,197,94,.12);
+
+    color:#22c55e;
+
+    font-weight:600;
+
+    border:
+    1px solid rgba(34,197,94,.25);
+}
+
+/* Download */
+
+.download-wrap{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+#downloadBtn{
+    display:none;
+    text-decoration:none;
+    color:white;
+    font-weight:600;
+
+    padding:18px 35px;
+
+    border-radius:15px;
+
+    background:
+    linear-gradient(
+        90deg,
+        #16a34a,
+        #22c55e
+    );
+}
+
+/* Features */
+
+.features{
+    display:flex;
+    gap:25px;
+}
+
+.feature{
+    flex:1;
+    padding:25px;
+}
+
+.feature i{
+    font-size:32px;
+    margin-bottom:15px;
+}
+
+.feature:nth-child(1) i{
+    color:#a855f7;
+}
+
+.feature:nth-child(2) i{
+    color:#38bdf8;
+}
+
+.feature:nth-child(3) i{
+    color:#fb923c;
+}
+
+.feature h4{
+    margin-bottom:8px;
+}
+.feature h4{
+    color: white !important;
+}
+
+.feature p{
+    color: white !important;
+}
+.feature p{
+    color:#94a3b8;
+}
+
+/* Mobile */
+
+@media(max-width:1000px){
+
+    .workflow{
+        flex-direction:column;
+    }
+
+    .comparison{
+        flex-direction:column;
+    }
+
+    .features{
+        flex-direction:column;
+    }
+
+    .arrow{
+        transform:rotate(90deg);
+    }
+
+}
+.divider{
+    width:450px;
+    margin:20px auto 0;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.divider span{
+    flex:1;
+    height:2px;
+
+    background:
+    linear-gradient(
+        90deg,
+        transparent,
+        #38bdf8,
+        transparent
+    );
+}
+
+.dot{
+    flex:none !important;
+
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+    background:#8b5cf6;
+
+    box-shadow:
+        0 0 15px #8b5cf6;
+}
+.image-card{
+    transition:.3s;
+}
+
+.image-card:hover{
+    transform:translateY(-6px);
+
+    box-shadow:
+    0 10px 30px rgba(59,130,246,.2);
+}
+.bg-circle{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(100px);
+    z-index:-1;
+}
+
+.one{
+    width:300px;
+    height:300px;
+
+    background:#2563eb;
+
+    top:100px;
+    left:100px;
+}
+
+.two{
+    width:350px;
+    height:350px;
+
+    background:#7c3aed;
+
+    right:100px;
+    top:100px;
+}
+    </style>
+</head>
+
+<body>
+<div class="bg-circle one"></div>
+<div class="bg-circle two"></div>
+<div class="container">
+
+    <!-- Header -->
+    <div class="title">
+        <h1>
+            <i class="fa-solid fa-brain"></i>
+            NeuralCanvas
+        </h1>
+
+        <p>Real-Time AI Style Transfer</p>
+        <div class="divider">
+    <span></span>
+    <span class="dot"></span>
+    <span></span>
+</div>
+    </div>
+
+    <!-- Top Workflow Card -->
+    <div class="workflow glass">
+
+        <div class="step">
+
+            <h3>1. Upload Image</h3>
+
+            <div class="upload-box">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                <div>
+                    <h4>Choose an image...</h4>
+                    <p>JPG, PNG, JPEG</p>
+                </div>
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                >
+            </div>
+
+        </div>
+
+        <div class="step">
+
+            <h3>2. Choose Style</h3>
+
+            <select id="styleSelect">
+                <option value="candy">🍬 Candy</option>
+                <option value="mosaic">🎨 Mosaic</option>
+                <option value="picasso">🖌 Picasso</option>
+            </select>
+
+        </div>
+
+        <div class="step">
+
+            <h3>3. Generate</h3>
+
+            <button onclick="uploadImage()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Generate Style
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Image Comparison -->
+    <div class="comparison">
+
+        <div class="image-card glass">
+
+            <h3>
+                <i class="fa-regular fa-image"></i>
+                Original Image
+            </h3>
+
+            <img id="previewImage">
+
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div class="image-card glass">
+
+            <h3>
+                <i class="fa-solid fa-palette"></i>
+                Styled Image
+            </h3>
+
+            <img id="resultImage">
+
+        </div>
+
+    </div>
+
+    <!-- Success -->
+    <div id="status"></div>
+
+    <!-- Download -->
+    <div class="download-wrap">
+
+        <a
+            id="downloadBtn"
+            download="styled_image.jpg"
+        >
+            <i class="fa-solid fa-download"></i>
+            Download Styled Image
+        </a>
+
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+
+        <div class="feature glass">
+
+            <i class="fa-solid fa-bolt"></i>
+
+            <h4>Real-Time Processing</h4>
+
+            <p>Fast and efficient AI rendering</p>
+
+        </div>
+
+        <div class="feature glass">
+
+            <i class="fa-solid fa-shield"></i>
+
+            <h4>High Quality Output</h4>
+
+            <p>Preserves details and style</p>
+
+        </div>
+
+        <div class="feature glass">
+
+            <i class="fa-solid fa-palette"></i>
+
+            <h4>Multiple Artistic Styles</h4>
+
+            <p>Candy, Mosaic, Picasso & More</p>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+const imageInput = document.getElementById("imageInput");
+const previewImage = document.getElementById("previewImage");
+
+document.querySelector(".upload-box")
+.addEventListener("click",()=>{
+    imageInput.click();
+});
+
+imageInput.addEventListener("change",function(){
+
+    const file=this.files[0];
+
+    if(file){
+
+        previewImage.src =
+            URL.createObjectURL(file);
+
+        previewImage.style.display="block";
+    }
+});
+
+
+async function uploadImage(){
+
+    const file = imageInput.files[0];
+
+    if(!file){
+        alert("Please select an image first.");
+        return;
+    }
+
+    const style =
+        document.getElementById("styleSelect").value;
+
+    const formData = new FormData();
+
+    formData.append("image", file);
+    formData.append("style", style);
+
+    document.getElementById("status").innerText =
+        "Generating image...";
+
+    try{
+
+        const response = await fetch("/stylize",{
+            method:"POST",
+            body:formData
+        });
+
+        if(!response.ok){
+            throw new Error("Generation Failed");
+        }
+
+        const blob = await response.blob();
+
+        const imageUrl =
+            URL.createObjectURL(blob);
+
+        const resultImage =
+            document.getElementById("resultImage");
+
+        resultImage.src = imageUrl;
+        resultImage.style.display = "block";
+
+        const downloadBtn =
+            document.getElementById("downloadBtn");
+
+        downloadBtn.href = imageUrl;
+        downloadBtn.style.display = "inline-block";
+
+        document.getElementById("status").innerText =
+            "✅ Style Transfer Completed Successfully";
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("status").innerText =
+            "❌ Error Generating Image";
+
+        alert(error);
+    }
+}
+
+</script>
+</body>
+</html>
